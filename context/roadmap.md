@@ -16,7 +16,7 @@
 - [x] Job detail page with visual pipeline
 - [x] Log streaming in UI
 - [x] Retry/cancel functionality
-- [ ] Add all 7 stages to the pipeline
+- [x] Add all 7 stages to the pipeline
 - [ ] Image generation with Replicate
 - [ ] SEO optimization stage
 - [ ] Email notifications with Resend
