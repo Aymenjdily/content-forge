@@ -17,7 +17,7 @@
 - [x] Log streaming in UI
 - [x] Retry/cancel functionality
 - [x] Add all 7 stages to the pipeline
-- [ ] Image generation with Replicate
+- [x] Image generation with Replicate
 - [ ] SEO optimization stage
 - [ ] Email notifications with Resend
 
