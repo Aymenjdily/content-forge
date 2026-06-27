@@ -1,6 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import PptxGenJS from "pptxgenjs";
 
 interface ExportParams {
   params: Promise<{ id: string }>;
@@ -101,6 +103,173 @@ function generateHtml(job: NonNullable<Awaited<ReturnType<typeof getJob>>>): str
 </html>`;
 }
 
+async function generatePdf(job: NonNullable<Awaited<ReturnType<typeof getJob>>>): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([612, 792]);
+  const { width, height } = page.getSize();
+  const seo = (job.seoMeta ?? {}) as { title?: string; metaDescription?: string; keywords?: string[] };
+  const title = seo.title || job.topic;
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  let y = height - 60;
+  const margin = 60;
+  const maxWidth = width - margin * 2;
+  const lineHeight = 16;
+
+  function drawText(text: string, options: { size?: number; bold?: boolean; color?: ReturnType<typeof rgb> } = {}) {
+    const size = options.size || 12;
+    const f = options.bold ? boldFont : font;
+    const color = options.color || rgb(0.1, 0.1, 0.1);
+
+    const words = text.split(" ");
+    let line = "";
+
+    for (const word of words) {
+      const testLine = line ? `${line} ${word}` : word;
+      const testWidth = f.widthOfTextAtSize(testLine, size);
+
+      if (testWidth > maxWidth && line) {
+        if (y < margin + lineHeight) {
+          const newPage = pdfDoc.addPage([612, 792]);
+          y = newPage.getSize().height - 60;
+          newPage.drawText(line, { x: margin, y, size, font: f, color });
+        } else {
+          page.drawText(line, { x: margin, y, size, font: f, color });
+        }
+        y -= lineHeight * (size / 12) * 1.2;
+        line = word;
+      } else {
+        line = testLine;
+      }
+    }
+
+    if (line) {
+      if (y < margin + lineHeight) {
+        const newPage = pdfDoc.addPage([612, 792]);
+        y = newPage.getSize().height - 60;
+        newPage.drawText(line, { x: margin, y, size, font: f, color });
+      } else {
+        page.drawText(line, { x: margin, y, size, font: f, color });
+      }
+      y -= lineHeight * (size / 12) * 1.2;
+    }
+
+    y -= 4;
+  }
+
+  drawText(title, { size: 22, bold: true });
+
+  if (seo.metaDescription) {
+    drawText(seo.metaDescription, { size: 11, color: rgb(0.4, 0.4, 0.4) });
+  }
+
+  if (seo.keywords?.length) {
+    drawText(`Keywords: ${seo.keywords.join(", ")}`, { size: 10, color: rgb(0.5, 0.5, 0.5) });
+  }
+
+  y -= 10;
+
+  const draftLines = (job.draft || "").split("\n");
+  for (const rawLine of draftLines) {
+    const line = rawLine.trim();
+    if (!line) {
+      y -= lineHeight;
+      continue;
+    }
+
+    if (line.startsWith("# ")) {
+      y -= 8;
+      drawText(line.slice(2), { size: 18, bold: true });
+      y -= 4;
+    } else if (line.startsWith("## ")) {
+      y -= 4;
+      drawText(line.slice(3), { size: 14, bold: true });
+      y -= 2;
+    } else if (line.startsWith("- ")) {
+      drawText(`• ${line.slice(2)}`, { size: 11 });
+    } else {
+      drawText(line, { size: 11 });
+    }
+  }
+
+  return pdfDoc.save();
+}
+
+async function generatePptx(job: NonNullable<Awaited<ReturnType<typeof getJob>>>): Promise<Buffer> {
+  const pres = new PptxGenJS();
+  const seo = (job.seoMeta ?? {}) as { title?: string; metaDescription?: string; keywords?: string[] };
+  const title = seo.title || job.topic;
+
+  pres.layout = "LAYOUT_16x9";
+  pres.defineSlideMaster({
+    title: "MASTER_SLIDE",
+    background: { color: "FFFFFF" },
+  });
+
+  const titleSlide = pres.addSlide({ masterName: "MASTER_SLIDE" });
+  titleSlide.addText(title, { x: 0.5, y: 1.5, w: "90%", h: 1, fontSize: 32, bold: true, color: "111827" });
+  if (seo.metaDescription) {
+    titleSlide.addText(seo.metaDescription, { x: 0.5, y: 2.8, w: "90%", h: 1, fontSize: 14, color: "6B7280" });
+  }
+  if (seo.keywords?.length) {
+    titleSlide.addText(seo.keywords.join(" • "), { x: 0.5, y: 4, w: "90%", h: 0.5, fontSize: 12, color: "9CA3AF" });
+  }
+
+  const draftLines = (job.draft || "").split("\n");
+  let currentSlide: PptxGenJS.Slide | null = null;
+  let currentBody: string[] = [];
+
+  function flushBody() {
+    if (currentSlide && currentBody.length > 0) {
+      currentSlide.addText(currentBody.join("\n"), {
+        x: 0.5,
+        y: 1.2,
+        w: "90%",
+        h: 4.5,
+        fontSize: 14,
+        color: "374151",
+        bullet: true,
+      });
+    }
+    currentBody = [];
+  }
+
+  for (const rawLine of draftLines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    if (line.startsWith("# ")) {
+      flushBody();
+      currentSlide = pres.addSlide({ masterName: "MASTER_SLIDE" });
+      currentSlide.addText(line.slice(2), { x: 0.5, y: 0.5, w: "90%", h: 0.8, fontSize: 24, bold: true, color: "111827" });
+    } else if (line.startsWith("## ")) {
+      if (currentSlide) {
+        currentBody.push(`• ${line.slice(3)}`);
+      } else {
+        currentSlide = pres.addSlide({ masterName: "MASTER_SLIDE" });
+        currentSlide.addText(line.slice(3), { x: 0.5, y: 0.5, w: "90%", h: 0.8, fontSize: 20, bold: true, color: "111827" });
+      }
+    } else if (line.startsWith("- ")) {
+      if (!currentSlide) {
+        currentSlide = pres.addSlide({ masterName: "MASTER_SLIDE" });
+      }
+      currentBody.push(line.slice(2));
+    } else {
+      if (!currentSlide) {
+        currentSlide = pres.addSlide({ masterName: "MASTER_SLIDE" });
+      }
+      currentBody.push(line);
+    }
+  }
+
+  flushBody();
+
+  const buffer = await pres.write({ outputType: "nodebuffer" });
+  return buffer as Buffer;
+}
+
 async function getJob(id: string, userId: string) {
   const job = await prisma.job.findUnique({
     where: { id },
@@ -141,7 +310,7 @@ export async function GET(request: Request, { params }: ExportParams) {
   const seo = (job.seoMeta ?? {}) as { title?: string; slug?: string };
   const filenameBase = (seo.slug || job.topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")).slice(0, 60);
 
-  let content: string;
+  let content: string | Uint8Array | Buffer;
   let contentType: string;
   let extension: string;
 
@@ -150,6 +319,16 @@ export async function GET(request: Request, { params }: ExportParams) {
       content = generateHtml(job);
       contentType = "text/html; charset=utf-8";
       extension = "html";
+      break;
+    case "pdf":
+      content = Buffer.from(await generatePdf(job));
+      contentType = "application/pdf";
+      extension = "pdf";
+      break;
+    case "pptx":
+      content = await generatePptx(job);
+      contentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+      extension = "pptx";
       break;
     case "json":
       content = JSON.stringify(
@@ -185,8 +364,9 @@ export async function GET(request: Request, { params }: ExportParams) {
   }
 
   const filename = `${filenameBase || "content"}.${extension}`;
+  const body = typeof content === "string" ? content : new Blob([content as BlobPart]);
 
-  return new NextResponse(content, {
+  return new NextResponse(body, {
     headers: {
       "Content-Type": contentType,
       "Content-Disposition": `attachment; filename="${filename}"`,

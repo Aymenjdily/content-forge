@@ -301,6 +301,8 @@ function ExportMenu({ job, onExport }: LibraryCardProps) {
             {[
               { value: "markdown", label: "Markdown" },
               { value: "html", label: "HTML" },
+              { value: "pdf", label: "PDF" },
+              { value: "pptx", label: "PowerPoint" },
               { value: "json", label: "JSON" },
             ].map((format) => (
               <button
