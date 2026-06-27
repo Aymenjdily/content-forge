@@ -9,17 +9,17 @@
 - [x] Minimal sidebar: Dashboard, New Job, Settings
 - [x] New Job form and job creation flow
 - [x] Single-stage pipeline: Topic → Research → Draft (no image/schedule yet)
-- [ ] Real-time progress via Trigger.dev events
-- [ ] Deploy to Vercel
+- [x] Real-time progress via Trigger.dev polling sync
+- [x] Deploy to Vercel
 
 ## Phase 2: Full Pipeline (Week 3)
 - [x] Job detail page with visual pipeline
+- [x] Log streaming in UI
+- [x] Retry/cancel functionality
 - [ ] Add all 7 stages to the pipeline
 - [ ] Image generation with Replicate
 - [ ] SEO optimization stage
 - [ ] Email notifications with Resend
-- [ ] Log streaming in UI
-- [ ] Retry/cancel functionality
 
 ## Phase 3: Polish & Sharing (Week 4)
 - [ ] Content Library with export features
