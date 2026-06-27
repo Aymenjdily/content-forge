@@ -36,10 +36,11 @@ export const imageTask = task({
       },
     });
 
-    try {
-      const replicateApiToken = process.env.REPLICATE_API_TOKEN;
-      let imageUrl: string | null = null;
+    const replicateApiToken = process.env.REPLICATE_API_TOKEN;
+    let imageUrl: string | null = null;
+    let imageError: string | null = null;
 
+    try {
       if (replicateApiToken) {
         const replicate = new Replicate({
           auth: replicateApiToken,
@@ -65,47 +66,46 @@ export const imageTask = task({
 
         logger.info("Replicate image generated", { jobId, imageUrl });
       } else {
-        logger.warn("REPLICATE_API_TOKEN not set, skipping image generation", { jobId });
+        imageError = "REPLICATE_API_TOKEN not set";
+        logger.warn(imageError, { jobId });
       }
-
-      const output: ImageOutput = {
-        imageUrl,
-      };
-
-      await prisma.job.update({
-        where: { id: jobId },
-        data: {
-          imageUrl,
-          progress: 65,
-        },
-      });
-
-      await prisma.jobStage.updateMany({
-        where: { jobId, name: "image" },
-        data: {
-          status: "COMPLETED",
-          completedAt: new Date(),
-          durationMs: Date.now() - stageStart,
-          output: output as unknown as Prisma.InputJsonValue,
-        },
-      });
-
-      logger.info("Image generation completed", { jobId });
-      return output;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Image generation failed";
-
-      await prisma.jobStage.updateMany({
-        where: { jobId, name: "image" },
-        data: {
-          status: "FAILED",
-          completedAt: new Date(),
-          durationMs: Date.now() - stageStart,
-          error: message,
-        },
-      });
-
-      throw error;
+      imageError = error instanceof Error ? error.message : "Image generation failed";
+      logger.error(imageError, { jobId });
     }
+
+    const output: ImageOutput = {
+      imageUrl,
+    };
+
+    await prisma.job.update({
+      where: { id: jobId },
+      data: {
+        imageUrl,
+        progress: 65,
+      },
+    });
+
+    await prisma.jobStage.updateMany({
+      where: { jobId, name: "image" },
+      data: {
+        status: imageError ? "FAILED" : "COMPLETED",
+        completedAt: new Date(),
+        durationMs: Date.now() - stageStart,
+        output: output as unknown as Prisma.InputJsonValue,
+        error: imageError,
+      },
+    });
+
+    await prisma.jobLog.create({
+      data: {
+        jobId,
+        level: imageError ? "ERROR" : "INFO",
+        message: imageError || "Image generation completed",
+      },
+    });
+
+    logger.info("Image stage finished", { jobId, success: !imageError });
+    return output;
   },
 });

@@ -71,7 +71,7 @@ export const contentForgeTask = task({
         throw new Error("Draft failed");
       }
       if (!imageResult.ok) {
-        throw new Error("Image generation failed");
+        logger.warn("Image generation failed, continuing without cover image", { jobId });
       }
 
       const seoResult = await seoTask.triggerAndWait({
