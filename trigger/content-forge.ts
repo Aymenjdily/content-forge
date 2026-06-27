@@ -56,20 +56,20 @@ export const contentForgeTask = task({
         throw new Error("Outline failed");
       }
 
-      const [draftResult, imageResult] = await Promise.all([
-        writeDraftTask.triggerAndWait({
-          jobId,
-          topic,
-          tone,
-          length,
-          outline: outlineResult.output,
-        }),
-        imageTask.triggerAndWait({ jobId, topic }),
-      ]);
+      const draftResult = await writeDraftTask.triggerAndWait({
+        jobId,
+        topic,
+        tone,
+        length,
+        outline: outlineResult.output,
+      });
 
       if (!draftResult.ok) {
         throw new Error("Draft failed");
       }
+
+      const imageResult = await imageTask.triggerAndWait({ jobId, topic });
+
       if (!imageResult.ok) {
         logger.warn("Image generation failed, continuing without cover image", { jobId });
       }
