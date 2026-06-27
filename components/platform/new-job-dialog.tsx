@@ -61,6 +61,89 @@ function SelectButton({
   );
 }
 
+function TemplateSelector({
+  templates,
+  selectedId,
+  onSelect,
+}: {
+  templates: Template[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = templates.find((t) => t.id === selectedId);
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Template</label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-4 py-2.5 text-sm transition-colors hover:border-foreground/30"
+        >
+          <span className={selected ? "text-foreground" : "text-muted-foreground"}>
+            {selected ? selected.name : "No template"}
+          </span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={cn("text-muted-foreground transition-transform", open && "rotate-180")}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+
+        {open && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-background p-1 shadow-lg">
+              <button
+                type="button"
+                onClick={() => {
+                  onSelect("");
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-muted",
+                  selectedId === "" && "bg-muted font-medium"
+                )}
+              >
+                No template
+              </button>
+              {templates.map((template) => (
+                <button
+                  key={template.id}
+                  type="button"
+                  onClick={() => {
+                    onSelect(template.id);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full flex-col rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-muted",
+                    selectedId === template.id && "bg-muted font-medium"
+                  )}
+                >
+                  <span>{template.name}</span>
+                  {template.description && (
+                    <span className="text-xs text-muted-foreground">{template.description}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CheckboxButton({
   options,
   value,
@@ -238,22 +321,11 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
           ))}
 
           {templates.length > 0 && (
-            <div className="space-y-2">
-              <label htmlFor="template" className="text-sm font-medium">Template</label>
-              <select
-                id="template"
-                value={selectedTemplateId}
-                onChange={(e) => applyTemplate(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">No template</option>
-                {templates.map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {template.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TemplateSelector
+              templates={templates}
+              selectedId={selectedTemplateId}
+              onSelect={applyTemplate}
+            />
           )}
 
           <div className="space-y-2">
