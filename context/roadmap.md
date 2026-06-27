@@ -23,7 +23,7 @@
 
 ## Phase 3: Polish & Sharing (Week 4)
 - [x] Content Library with export features
-- [ ] Template system
+- [x] Template system
 - [ ] Cron scheduler for recurring jobs
 - [ ] Mobile responsiveness
 - [ ] Dark mode

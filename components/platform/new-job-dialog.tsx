@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createJob } from "@/lib/actions/jobs";
+import { createTemplate, getTemplates, type Template } from "@/lib/actions/templates";
 import { useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -120,6 +121,10 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
   const [tone, setTone] = useState("professional");
   const [length, setLength] = useState("medium");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["blog"]);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [isSavingTemplate, startSaveTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
   const [submissionCount, setSubmissionCount] = useState(0);
@@ -138,6 +143,32 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
     }
   }, [state.success, state.jobId, submissionCount, toast, onOpenChange, router]);
 
+  useEffect(() => {
+    if (open) {
+      getTemplates().then((data) => setTemplates(data));
+    }
+  }, [open]);
+
+  const handleSaveTemplate = (name: string, description: string) => {
+    startSaveTransition(async () => {
+      const formData = new FormData();
+      formData.set("name", name);
+      formData.set("description", description);
+      formData.set("tone", tone);
+      formData.set("length", length);
+      selectedPlatforms.forEach((p) => formData.append("platforms", p));
+
+      const result = await createTemplate({}, formData);
+      if (result.success && result.template) {
+        setTemplates((prev) => [result.template!, ...prev]);
+        setShowSaveTemplate(false);
+        toast({ title: "Template saved", message: `"${result.template.name}" has been saved.`, type: "success" });
+      } else if (result.error) {
+        toast({ title: "Error", message: result.error, type: "error" });
+      }
+    });
+  };
+
   const handleSubmit = () => {
     setSubmissionCount((count) => count + 1);
   };
@@ -146,11 +177,25 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
     setTone("professional");
     setLength("medium");
     setSelectedPlatforms(["blog"]);
+    setSelectedTemplateId("");
+    setShowSaveTemplate(false);
   };
 
   const handleClose = () => {
     onOpenChange(false);
     resetForm();
+  };
+
+  const applyTemplate = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    if (!templateId) return;
+
+    const template = templates.find((t) => t.id === templateId);
+    if (template) {
+      setTone(template.config.tone);
+      setLength(template.config.length);
+      setSelectedPlatforms(template.config.platforms);
+    }
   };
 
   if (!open) {
@@ -192,6 +237,25 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
             <input key={p} type="hidden" name="platforms" value={p} />
           ))}
 
+          {templates.length > 0 && (
+            <div className="space-y-2">
+              <label htmlFor="template" className="text-sm font-medium">Template</label>
+              <select
+                id="template"
+                value={selectedTemplateId}
+                onChange={(e) => applyTemplate(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="">No template</option>
+                {templates.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="space-y-2">
             <label htmlFor="topic" className="text-sm font-medium">Topic or title</label>
             <input
@@ -229,6 +293,58 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
           <div className="space-y-3">
             <label className="text-sm font-medium">Platforms</label>
             <CheckboxButton options={platforms} value={selectedPlatforms} onChange={setSelectedPlatforms} />
+          </div>
+
+          <div className="rounded-xl border border-border bg-muted/30 p-4">
+            {!showSaveTemplate ? (
+              <button
+                type="button"
+                onClick={() => setShowSaveTemplate(true)}
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Save current config as template
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm font-medium">Save as template</p>
+                <input
+                  type="text"
+                  name="templateName"
+                  placeholder="Template name"
+                  required
+                  minLength={2}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <input
+                  type="text"
+                  name="templateDescription"
+                  placeholder="Description (optional)"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isSavingTemplate}
+                    onClick={() => {
+                      const nameInput = document.querySelector<HTMLInputElement>('input[name="templateName"]')?.value;
+                      const descriptionInput = document.querySelector<HTMLInputElement>('input[name="templateDescription"]')?.value;
+                      if (!nameInput) return;
+                      handleSaveTemplate(nameInput, descriptionInput || "");
+                    }}
+                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+                  >
+                    {isSavingTemplate ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSaveTemplate(false)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {state.error && (
