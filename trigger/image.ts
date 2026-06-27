@@ -46,25 +46,29 @@ export const imageTask = task({
           auth: replicateApiToken,
         });
 
-        const result = await replicate.run(
-          "black-forest-labs/flux-schnell",
-          {
-            input: {
-              prompt: `Professional cover image for an article about ${topic}, clean modern editorial style, no text`,
-              aspect_ratio: "16:9",
-              num_outputs: 1,
-            },
-          }
-        );
+        const prediction = await replicate.predictions.create({
+          model: "black-forest-labs/flux-schnell",
+          input: {
+            prompt: `Professional cover image for an article about ${topic}, clean modern editorial style, no text`,
+            aspect_ratio: "16:9",
+            num_outputs: 1,
+          },
+        });
 
-        if (typeof result === "string") {
-          imageUrl = result;
-        } else if (Array.isArray(result) && result.length > 0) {
-          const first = result[0];
+        const completed = await replicate.wait(prediction);
+        logger.info("Replicate raw output", { jobId, output: completed.output });
+
+        const rawOutput = completed.output;
+        if (typeof rawOutput === "string") {
+          imageUrl = rawOutput;
+        } else if (Array.isArray(rawOutput) && rawOutput.length > 0) {
+          const first = rawOutput[0];
           imageUrl = typeof first === "string" ? first : null;
+        } else if (rawOutput && typeof rawOutput === "object" && "url" in rawOutput && typeof rawOutput.url === "string") {
+          imageUrl = rawOutput.url;
         }
 
-        logger.info("Replicate image generated", { jobId, imageUrl });
+        logger.info("Replicate image parsed", { jobId, imageUrl });
       } else {
         imageError = "REPLICATE_API_TOKEN not set";
         logger.warn(imageError, { jobId });
