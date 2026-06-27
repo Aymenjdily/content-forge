@@ -1,17 +1,14 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import type { OutlineOutput } from "./outline";
 
 interface WriteDraftInput {
   jobId: string;
   topic: string;
   tone: string;
   length: string;
-  research: {
-    summary: string;
-    keyPoints: string[];
-    sources: string[];
-  };
+  outline: OutlineOutput;
 }
 
 interface WriteDraftOutput {
@@ -26,7 +23,7 @@ const lengthWords: Record<string, number> = {
 
 export const writeDraftTask = task({
   id: "write-draft",
-  run: async ({ jobId, topic, tone, length, research }: WriteDraftInput): Promise<WriteDraftOutput> => {
+  run: async ({ jobId, topic, tone, length, outline }: WriteDraftInput): Promise<WriteDraftOutput> => {
     logger.info("Starting draft", { jobId, topic, tone, length });
 
     const stageStart = Date.now();
@@ -34,7 +31,7 @@ export const writeDraftTask = task({
     await prisma.jobStage.create({
       data: {
         jobId,
-        name: "writeDraft",
+        name: "draft",
         status: "RUNNING",
         startedAt: new Date(),
       },
@@ -43,8 +40,8 @@ export const writeDraftTask = task({
     await prisma.job.update({
       where: { id: jobId },
       data: {
-        currentStage: "writeDraft",
-        progress: 60,
+        currentStage: "draft",
+        progress: 50,
       },
     });
 
@@ -52,12 +49,16 @@ export const writeDraftTask = task({
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const words = lengthWords[length] ?? lengthWords.medium;
+      const sectionsMarkdown = outline.sections
+        .map((section) => {
+          const points = section.points.map((point) => `- ${point}`).join("\n");
+          return `## ${section.heading}\n\n${points}`;
+        })
+        .join("\n\n");
 
-      const draft = `# ${topic}\n\n${research.summary}\n\n## Key Takeaways\n\n${research.keyPoints
-        .map((point) => `- ${point}`)
-        .join("\n")}\n\n## Why It Matters\n\nThis ${tone} guide explores ${topic} in depth. Expect around ${words} words of actionable insight, real-world context, and clear next steps for your content strategy.\n\n${
-        research.sources.length > 0
-          ? `## Sources\n\n${research.sources.map((source) => `- ${source}`).join("\n")}`
+      const draft = `# ${outline.title || topic}\n\n${outline.research.summary}\n\n${sectionsMarkdown}\n\n## Why It Matters\n\nThis ${tone} guide explores ${topic} in depth. Expect around ${words} words of actionable insight, real-world context, and clear next steps for your content strategy.\n\n${
+        outline.research.sources.length > 0
+          ? `## Sources\n\n${outline.research.sources.map((source) => `- ${source}`).join("\n")}`
           : ""
       }`;
 
@@ -65,14 +66,14 @@ export const writeDraftTask = task({
         where: { id: jobId },
         data: {
           draft,
-          progress: 90,
+          progress: 70,
         },
       });
 
       const output: WriteDraftOutput = { draft };
 
       await prisma.jobStage.updateMany({
-        where: { jobId, name: "writeDraft" },
+        where: { jobId, name: "draft" },
         data: {
           status: "COMPLETED",
           completedAt: new Date(),
@@ -87,7 +88,7 @@ export const writeDraftTask = task({
       const message = error instanceof Error ? error.message : "Draft failed";
 
       await prisma.jobStage.updateMany({
-        where: { jobId, name: "writeDraft" },
+        where: { jobId, name: "draft" },
         data: {
           status: "FAILED",
           completedAt: new Date(),

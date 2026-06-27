@@ -14,6 +14,9 @@ interface Job {
   currentStage: string | null;
   config: Record<string, unknown>;
   draft: string | null;
+  imageUrl: string | null;
+  seoMeta: Record<string, unknown> | null;
+  scheduledPosts: Record<string, unknown> | null;
   createdAt: string;
   startedAt: string | null;
   completedAt: string | null;
@@ -265,6 +268,51 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         </div>
       )}
 
+      {job.seoMeta && (
+        <div className="space-y-4">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">SEO Metadata</h3>
+          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm space-y-3">
+            <SeoRow label="Title" value={(job.seoMeta as { title?: string }).title} />
+            <SeoRow label="Slug" value={(job.seoMeta as { slug?: string }).slug} />
+            <SeoRow label="Meta description" value={(job.seoMeta as { metaDescription?: string }).metaDescription} />
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Keywords</p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {((job.seoMeta as { keywords?: string[] }).keywords || []).map((keyword) => (
+                  <span key={keyword} className="rounded-lg bg-muted px-2 py-1 text-xs">{keyword}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {job.imageUrl && (
+        <div className="space-y-4">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Cover Image</h3>
+          <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+            <img src={job.imageUrl} alt="Generated cover" className="rounded-xl" />
+          </div>
+        </div>
+      )}
+
+      {job.scheduledPosts && (
+        <div className="space-y-4">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Scheduled Posts</h3>
+          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+            <ul className="space-y-2">
+              {((job.scheduledPosts as { posts?: { platform: string; scheduledAt: string; status: string }[] }).posts || []).map((post, index) => (
+                <li key={index} className="flex items-center justify-between text-sm">
+                  <span className="font-medium capitalize">{post.platform}</span>
+                  <span className="text-muted-foreground">{new Date(post.scheduledAt).toLocaleString()}</span>
+                  <span className="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase">{post.status}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {job.logs.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -290,6 +338,15 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SeoRow({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-sm">{value || "—"}</p>
     </div>
   );
 }

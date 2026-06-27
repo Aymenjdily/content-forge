@@ -54,8 +54,8 @@ export async function POST(
 
   if (result.error) return result.error;
 
-  const { job } = result;
-  const config = (job.config as { tone?: string; length?: string }) ?? {};
+  const { job, dbUser } = result;
+  const config = (job.config as { tone?: string; length?: string; platforms?: string[] }) ?? {};
 
   await prisma.$transaction([
     prisma.jobStage.deleteMany({ where: { jobId: id } }),
@@ -89,10 +89,12 @@ export async function POST(
   try {
     triggerRun = await contentForgeTask.trigger({
       jobId: id,
+      userId: dbUser.id,
       topic: job.topic,
       sourceUrl: job.sourceUrl || undefined,
       tone: config.tone || "professional",
       length: config.length || "medium",
+      platforms: config.platforms || [],
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to retry job";

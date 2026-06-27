@@ -69,10 +69,12 @@ export async function createJob(_prevState: CreateJobState, formData: FormData):
   try {
     triggerRun = await contentForgeTask.trigger({
       jobId: job.id,
+      userId: user.id,
       topic,
       sourceUrl: sourceUrl || undefined,
       tone,
       length,
+      platforms,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to start pipeline";
