@@ -1,0 +1,255 @@
+"use client";
+
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createJob } from "@/lib/actions/jobs";
+import { useToast } from "@/components/notifications";
+import { cn } from "@/lib/utils";
+
+const tones = [
+  { value: "professional", label: "Professional" },
+  { value: "casual", label: "Casual" },
+  { value: "witty", label: "Witty" },
+  { value: "educational", label: "Educational" },
+];
+
+const lengths = [
+  { value: "short", label: "Short" },
+  { value: "medium", label: "Medium" },
+  { value: "long", label: "Long" },
+];
+
+const platforms = [
+  { value: "blog", label: "Blog post" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "twitter", label: "Twitter / X" },
+];
+
+interface NewJobDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+function SelectButton({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          className={cn(
+            "rounded-lg border px-3 py-2 text-sm font-medium transition-all",
+            value === option.value
+              ? "border-foreground bg-foreground text-background"
+              : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CheckboxButton({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string[];
+  onChange: (value: string[]) => void;
+}) {
+  const toggle = (optionValue: string) => {
+    if (value.includes(optionValue)) {
+      onChange(value.filter((v) => v !== optionValue));
+    } else {
+      onChange([...value, optionValue]);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const selected = value.includes(option.value);
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => toggle(option.value)}
+            className={cn(
+              "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
+              selected
+                ? "border-accent bg-accent/10 text-amber-800"
+                : "border-border bg-background text-muted-foreground hover:border-accent/30 hover:text-foreground"
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-4 w-4 items-center justify-center rounded border transition-colors",
+                selected
+                  ? "border-accent bg-accent text-accent-foreground"
+                  : "border-border bg-background"
+              )}
+            >
+              {selected && (
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </span>
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
+  const [state, formAction, pending] = useActionState(createJob, {});
+  const [tone, setTone] = useState("professional");
+  const [length, setLength] = useState("medium");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["blog"]);
+  const { toast } = useToast();
+  const router = useRouter();
+  const notifiedRef = useRef(false);
+
+  useEffect(() => {
+    if (state.success && state.jobId && !notifiedRef.current) {
+      notifiedRef.current = true;
+      toast({
+        title: "Job created",
+        message: "Your content pipeline has started. We'll notify you when it's ready.",
+        type: "info",
+      });
+      onOpenChange(false);
+      router.push(`/platform/jobs/${state.jobId}`);
+    }
+  }, [state.success, state.jobId]);
+
+  const resetForm = () => {
+    setTone("professional");
+    setLength("medium");
+    setSelectedPlatforms(["blog"]);
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    resetForm();
+  };
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        onClick={handleClose}
+        className="absolute inset-0 bg-black/40"
+        aria-label="Close dialog"
+      />
+
+      <div className="relative z-10 w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-lg">
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-semibold tracking-tight">Create a new content job</h3>
+            <p className="text-sm text-muted-foreground">Tell us what you want to write about and we will research, draft, and optimize it.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <form action={formAction} className="space-y-5">
+          <input type="hidden" name="tone" value={tone} />
+          <input type="hidden" name="length" value={length} />
+          {selectedPlatforms.map((p) => (
+            <input key={p} type="hidden" name="platforms" value={p} />
+          ))}
+
+          <div className="space-y-2">
+            <label htmlFor="topic" className="text-sm font-medium">Topic or title</label>
+            <input
+              id="topic"
+              name="topic"
+              type="text"
+              required
+              minLength={3}
+              placeholder="e.g. The future of AI in content marketing"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="sourceUrl" className="text-sm font-medium">Source URL (optional)</label>
+            <input
+              id="sourceUrl"
+              name="sourceUrl"
+              type="url"
+              placeholder="https://example.com/article"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Tone</label>
+            <SelectButton options={tones} value={tone} onChange={setTone} />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Length</label>
+            <SelectButton options={lengths} value={length} onChange={setLength} />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Platforms</label>
+            <CheckboxButton options={platforms} value={selectedPlatforms} onChange={setSelectedPlatforms} />
+          </div>
+
+          {state.error && (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{state.error}</p>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={pending}
+              className={cn(
+                "rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+              )}
+            >
+              {pending ? "Creating..." : "Create Job"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
