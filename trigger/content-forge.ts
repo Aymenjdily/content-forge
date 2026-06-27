@@ -92,10 +92,14 @@ export const contentForgeTask = task({
         throw new Error("Scheduling failed");
       }
 
-      const notifyResult = await notifyTask.triggerAndWait({ jobId, userId });
-      if (!notifyResult.ok) {
-        throw new Error("Notification failed");
-      }
+      await notifyTask.triggerAndWait({
+        jobId,
+        userId,
+        topic,
+        draft: draftResult.output.draft,
+        imageUrl: imageResult.ok ? imageResult.output.imageUrl : null,
+        seoMeta: seoResult.ok ? seoResult.output : null,
+      });
 
       await prisma.job.update({
         where: { id: jobId },

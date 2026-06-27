@@ -1,6 +1,7 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { openai, isOpenAIEnabled } from "@/lib/ai/openai";
 
 interface SeoInput {
   jobId: string;
@@ -13,6 +14,61 @@ export interface SeoOutput {
   metaDescription: string;
   keywords: string[];
   slug: string;
+}
+
+function generateFallbackSeo(topic: string): SeoOutput {
+  const slug = topic
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return {
+    title: `${topic}: A Complete Guide`,
+    metaDescription: `Learn everything about ${topic}. Actionable insights, practical examples, and clear next steps.`,
+    keywords: [topic, "guide", "content strategy", "best practices"],
+    slug,
+  };
+}
+
+async function generateSeoWithAI(topic: string, draft: string): Promise<SeoOutput> {
+  if (!openai) {
+    throw new Error("OpenAI client is not configured");
+  }
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    temperature: 0.7,
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an SEO expert. Generate search-optimized metadata for a piece of content. Return only valid JSON with keys: title (string, max 60 chars), metaDescription (string, max 160 chars), keywords (array of 5-8 strings), slug (URL-safe string, lowercase, hyphenated, no special chars).",
+      },
+      {
+        role: "user",
+        content: `Topic: ${topic}\n\nDraft:\n${draft.slice(0, 4000)}`,
+      },
+    ],
+  });
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) {
+    throw new Error("OpenAI returned empty SEO response");
+  }
+
+  const parsed = JSON.parse(raw) as Partial<SeoOutput>;
+
+  if (!parsed.title || !parsed.metaDescription || !Array.isArray(parsed.keywords) || !parsed.slug) {
+    throw new Error("OpenAI SEO response missing required fields");
+  }
+
+  return {
+    title: parsed.title.slice(0, 60),
+    metaDescription: parsed.metaDescription.slice(0, 160),
+    keywords: parsed.keywords.filter((k) => typeof k === "string").slice(0, 8),
+    slug: parsed.slug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+  };
 }
 
 export const seoTask = task({
@@ -40,20 +96,21 @@ export const seoTask = task({
     });
 
     try {
-      // TODO: integrate AI for real SEO optimization
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      let output: SeoOutput;
 
-      const slug = topic
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
-
-      const output: SeoOutput = {
-        title: `${topic}: A Complete Guide`,
-        metaDescription: `Learn everything about ${topic}. Actionable insights, practical examples, and clear next steps.`,
-        keywords: [topic, "guide", "content strategy", "best practices"],
-        slug,
-      };
+      if (isOpenAIEnabled()) {
+        try {
+          output = await generateSeoWithAI(topic, draft);
+          logger.info("SEO optimized with OpenAI", { jobId });
+        } catch (aiError) {
+          const message = aiError instanceof Error ? aiError.message : "OpenAI SEO failed";
+          logger.warn(`Falling back to static SEO metadata: ${message}`, { jobId });
+          output = generateFallbackSeo(topic);
+        }
+      } else {
+        logger.warn("OPENAI_API_KEY not set, using fallback SEO metadata", { jobId });
+        output = generateFallbackSeo(topic);
+      }
 
       await prisma.job.update({
         where: { id: jobId },

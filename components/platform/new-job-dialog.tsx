@@ -122,11 +122,12 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["blog"]);
   const { toast } = useToast();
   const router = useRouter();
-  const notifiedRef = useRef(false);
+  const [submissionCount, setSubmissionCount] = useState(0);
+  const processedCountRef = useRef(0);
 
   useEffect(() => {
-    if (state.success && state.jobId && !notifiedRef.current) {
-      notifiedRef.current = true;
+    if (state.success && state.jobId && submissionCount > processedCountRef.current) {
+      processedCountRef.current = submissionCount;
       toast({
         title: "Job created",
         message: "Your content pipeline has started. We'll notify you when it's ready.",
@@ -135,7 +136,11 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
       onOpenChange(false);
       router.push(`/platform/jobs/${state.jobId}`);
     }
-  }, [state.success, state.jobId]);
+  }, [state.success, state.jobId, submissionCount, toast, onOpenChange, router]);
+
+  const handleSubmit = () => {
+    setSubmissionCount((count) => count + 1);
+  };
 
   const resetForm = () => {
     setTone("professional");
@@ -180,7 +185,7 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
           </button>
         </div>
 
-        <form action={formAction} className="space-y-5">
+        <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
           <input type="hidden" name="tone" value={tone} />
           <input type="hidden" name="length" value={length} />
           {selectedPlatforms.map((p) => (

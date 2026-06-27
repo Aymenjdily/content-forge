@@ -18,11 +18,11 @@
 - [x] Retry/cancel functionality
 - [x] Add all 7 stages to the pipeline
 - [x] Image generation with Replicate
-- [ ] SEO optimization stage
-- [ ] Email notifications with Resend
+- [x] SEO optimization stage
+- [x] Email notifications with Resend
 
 ## Phase 3: Polish & Sharing (Week 4)
-- [ ] Content Library with export features
+- [x] Content Library with export features
 - [ ] Template system
 - [ ] Cron scheduler for recurring jobs
 - [ ] Mobile responsiveness
