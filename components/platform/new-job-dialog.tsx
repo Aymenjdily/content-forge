@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from "reac
 import { useRouter } from "next/navigation";
 import { createJob } from "@/lib/actions/jobs";
 import { createTemplate, getTemplates, type Template } from "@/lib/actions/templates";
+import { Button } from "@/components/platform/button";
 import { useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -394,8 +395,9 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 />
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     type="button"
+                    size="sm"
                     disabled={isSavingTemplate}
                     onClick={() => {
                       const nameInput = document.querySelector<HTMLInputElement>('input[name="templateName"]')?.value;
@@ -403,10 +405,9 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
                       if (!nameInput) return;
                       handleSaveTemplate(nameInput, descriptionInput || "");
                     }}
-                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
                   >
                     {isSavingTemplate ? "Saving..." : "Save"}
-                  </button>
+                  </Button>
                   <button
                     type="button"
                     onClick={() => setShowSaveTemplate(false)}
@@ -431,15 +432,9 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={pending}
-              className={cn(
-                "rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-              )}
-            >
+            <Button type="submit" disabled={pending}>
               {pending ? "Creating..." : "Create Job"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

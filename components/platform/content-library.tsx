@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/platform/button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/notifications";
 
@@ -290,13 +291,9 @@ function ExportMenu({ job, onExport }: LibraryCardProps) {
 
   return (
     <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-colors hover:bg-foreground/90"
-      >
+      <Button type="button" size="sm" onClick={() => setOpen((prev) => !prev)}>
         Export
-      </button>
+      </Button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />

@@ -2,8 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useUser } from "@clerk/nextjs";
+import { Button } from "@/components/platform/button";
 import { useToast } from "@/components/notifications";
-import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { user, isLoaded } = useUser();
@@ -163,21 +163,12 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="reset"
-                  className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
-                >
+                <Button type="reset" variant="secondary">
                   Reset
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className={cn(
-                    "rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-                  )}
-                >
+                </Button>
+                <Button type="submit" disabled={isPending}>
                   {isPending ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -218,11 +209,12 @@ export default function SettingsPage() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  className="w-full"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -230,7 +222,7 @@ export default function SettingsPage() {
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
                   {uploading ? "Uploading..." : "Upload new photo"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

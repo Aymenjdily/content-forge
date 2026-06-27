@@ -3,6 +3,7 @@
 import { notFound } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/platform/button";
 import { useNotifications, useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -384,16 +385,12 @@ function ExportButton({ jobId, topic }: { jobId: string; topic: string }) {
 
   return (
     <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
-      >
+      <Button type="button" size="sm" variant="secondary" onClick={() => setOpen((prev) => !prev)}>
         Export
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="6 9 12 15 18 9" />
         </svg>
-      </button>
+      </Button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />

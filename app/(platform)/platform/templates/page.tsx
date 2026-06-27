@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { createTemplate, deleteTemplate, getTemplates, type Template } from "@/lib/actions/templates";
+import { Button } from "@/components/platform/button";
 import { useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -88,17 +89,13 @@ export default function TemplatesPage() {
             Save reusable configurations for your content jobs. Apply them with one click when creating a new job.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-        >
+        <Button onClick={() => setShowCreate(true)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
           New Template
-        </button>
+        </Button>
       </div>
 
       {loading ? (
@@ -168,17 +165,13 @@ function TemplateCard({ template, onDelete }: { template: Template; onDelete: (i
         <div className="flex items-center gap-2">
           <Link
             href="/platform"
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+            className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
           >
             Use
           </Link>
-          <button
-            type="button"
-            onClick={() => onDelete(template.id)}
-            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
-          >
+          <Button variant="danger" size="sm" onClick={() => onDelete(template.id)}>
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -364,13 +357,9 @@ function CreateTemplateDialog({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-            >
+            <Button type="submit" disabled={isPending}>
               {isPending ? "Creating..." : "Create Template"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
