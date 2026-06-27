@@ -1,6 +1,7 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import Replicate from "replicate";
 
 interface ImageInput {
   jobId: string;
@@ -36,17 +37,45 @@ export const imageTask = task({
     });
 
     try {
-      // TODO: integrate Replicate or DALL-E here
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const replicateApiToken = process.env.REPLICATE_API_TOKEN;
+      let imageUrl: string | null = null;
+
+      if (replicateApiToken) {
+        const replicate = new Replicate({
+          auth: replicateApiToken,
+        });
+
+        const result = await replicate.run(
+          "black-forest-labs/flux-schnell",
+          {
+            input: {
+              prompt: `Professional cover image for an article about ${topic}, clean modern editorial style, no text`,
+              aspect_ratio: "16:9",
+              num_outputs: 1,
+            },
+          }
+        );
+
+        if (typeof result === "string") {
+          imageUrl = result;
+        } else if (Array.isArray(result) && result.length > 0) {
+          const first = result[0];
+          imageUrl = typeof first === "string" ? first : null;
+        }
+
+        logger.info("Replicate image generated", { jobId, imageUrl });
+      } else {
+        logger.warn("REPLICATE_API_TOKEN not set, skipping image generation", { jobId });
+      }
 
       const output: ImageOutput = {
-        imageUrl: null,
+        imageUrl,
       };
 
       await prisma.job.update({
         where: { id: jobId },
         data: {
-          imageUrl: output.imageUrl,
+          imageUrl,
           progress: 65,
         },
       });
