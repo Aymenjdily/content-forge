@@ -118,7 +118,7 @@ export default function SettingsPage() {
 
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl border border-border bg-background p-6 shadow-sm sm:p-8">
             <div className="mb-6">
               <h3 className="text-lg font-semibold tracking-tight">Profile details</h3>
               <p className="text-sm text-muted-foreground">Update your name and public profile information.</p>
@@ -175,7 +175,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl border border-border bg-background p-6 shadow-sm sm:p-8">
             <div className="mb-6">
               <h3 className="text-lg font-semibold tracking-tight">Profile photo</h3>
               <p className="text-sm text-muted-foreground">Upload a new avatar. JPG, PNG, or GIF up to 5MB.</p>

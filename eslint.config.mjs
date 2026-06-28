@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Trigger.dev build cache and generated Prisma client:
     ".trigger/**",
     "lib/generated/**",
+    // One-off Node scripts that use CommonJS:
+    "scripts/**",
   ]),
 ]);
 

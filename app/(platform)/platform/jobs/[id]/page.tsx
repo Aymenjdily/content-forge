@@ -124,7 +124,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
   if (error) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-        <p className="text-red-600">{error}</p>
+        <p className="text-status-red-text">{error}</p>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-background p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Progress</span>
           <span className="text-sm font-medium">{job.progress}%</span>
@@ -199,13 +199,13 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <div
                 key={stage.id}
                 className={cn(
-                  "relative rounded-2xl border bg-white p-5 shadow-sm transition-all hover:shadow-md",
+                  "relative rounded-2xl border bg-background p-5 shadow-sm transition-all hover:shadow-md",
                   stage.status === "RUNNING"
-                    ? "border-blue-200"
+                    ? "border-status-blue-border"
                     : stage.status === "COMPLETED"
-                      ? "border-green-200"
+                      ? "border-status-green-border"
                       : stage.status === "FAILED"
-                        ? "border-red-200"
+                        ? "border-status-red-border"
                         : "border-border"
                 )}
               >
@@ -229,7 +229,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                 </div>
 
                 {stage.error && (
-                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{stage.error}</p>
+                  <p className="mt-3 rounded-lg bg-status-red-bg px-3 py-2 text-xs text-status-red-text">{stage.error}</p>
                 )}
               </div>
             );
@@ -246,7 +246,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <ExportButton jobId={job.id} topic={job.topic} />
             </div>
           </div>
-          <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+          <article className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-8">
             <div className="prose prose-sm max-w-none">
               {job.draft.split("\n").map((line, index) => {
                 if (line.startsWith("# ")) {
@@ -275,7 +275,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {job.seoMeta && (
         <div className="space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">SEO Metadata</h3>
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm space-y-3">
+          <div className="rounded-2xl border border-border bg-background p-6 shadow-sm space-y-3">
             <SeoRow label="Title" value={(job.seoMeta as { title?: string }).title} />
             <SeoRow label="Slug" value={(job.seoMeta as { slug?: string }).slug} />
             <SeoRow label="Meta description" value={(job.seoMeta as { metaDescription?: string }).metaDescription} />
@@ -294,7 +294,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {job.imageUrl && (
         <div className="space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Cover Image</h3>
-          <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+          <div className="rounded-2xl border border-border bg-background p-4 shadow-sm">
             <img src={job.imageUrl} alt="Generated cover" className="rounded-xl" />
           </div>
         </div>
@@ -303,13 +303,13 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {job.scheduledPosts && (
         <div className="space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Scheduled Posts</h3>
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
-            <ul className="space-y-2">
+          <div className="rounded-2xl border border-border bg-background p-6 shadow-sm">
+            <ul className="space-y-3">
               {((job.scheduledPosts as { posts?: { platform: string; scheduledAt: string; status: string }[] }).posts || []).map((post, index) => (
-                <li key={index} className="flex items-center justify-between text-sm">
+                <li key={index} className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
                   <span className="font-medium capitalize">{post.platform}</span>
                   <span className="text-muted-foreground">{new Date(post.scheduledAt).toLocaleString()}</span>
-                  <span className="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase">{post.status}</span>
+                  <span className="w-fit rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase">{post.status}</span>
                 </li>
               ))}
             </ul>
@@ -323,7 +323,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
             <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Logs</h3>
             <span className="text-xs text-muted-foreground">{job.logs.length} entries</span>
           </div>
-          <div className="overflow-hidden rounded-2xl border border-border bg-black text-sm font-mono">
+          <div className="overflow-hidden rounded-2xl border border-border bg-black text-sm font-mono dark:bg-muted">
             <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
               <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
               <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
@@ -335,7 +335,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                 <div key={log.id} className="flex gap-3 py-1">
                   <span className="flex-shrink-0 text-white/30">{String(index + 1).padStart(3, "0")}</span>
                   <span className={cn("flex-shrink-0 text-[10px] font-bold uppercase", logLevelColor(log.level))}>{log.level.padEnd(5)}</span>
-                  <span className="text-white/70">{log.message}</span>
+                  <span className="break-words text-white/70">{log.message}</span>
                 </div>
               ))}
             </div>
@@ -394,7 +394,7 @@ function ExportButton({ jobId, topic }: { jobId: string; topic: string }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-xl border border-border bg-white p-1 shadow-lg">
+          <div className="absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-xl border border-border bg-background p-1 shadow-lg">
             {[
               { value: "markdown", label: "Markdown" },
               { value: "html", label: "HTML" },
@@ -420,7 +420,7 @@ function ExportButton({ jobId, topic }: { jobId: string; topic: string }) {
 
 function ConfigCard({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-colors hover:border-foreground/10">
+    <div className="rounded-2xl border border-border bg-background p-5 shadow-sm transition-colors hover:border-foreground/10">
       <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
       <p className="mt-2 text-[15px] font-medium capitalize leading-6">{value || "—"}</p>
     </div>
@@ -430,13 +430,13 @@ function ConfigCard({ label, value }: { label: string; value?: string }) {
 function logLevelColor(level: string) {
   switch (level) {
     case "ERROR":
-      return "text-red-400";
+      return "text-status-red-text";
     case "WARN":
-      return "text-amber-400";
+      return "text-status-amber-text";
     case "DEBUG":
-      return "text-slate-400";
+      return "text-status-slate-text";
     default:
-      return "text-blue-400";
+      return "text-status-blue-text";
   }
 }
 
@@ -445,11 +445,11 @@ function getStatusMeta(status: string) {
     case "RUNNING":
       return {
         label: "Running",
-        bg: "bg-blue-50",
-        badge: "border-blue-200 bg-blue-50 text-blue-700",
-        bar: "bg-blue-600",
+        bg: "bg-status-blue-bg",
+        badge: "border-status-blue-border bg-status-blue-bg text-status-blue-text",
+        bar: "bg-status-blue-text",
         icon: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-spin text-blue-600"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-spin text-status-blue-text"
           >
             <path d="M21 12a9 9 0 11-6.219-8.56" />
           </svg>
@@ -458,11 +458,11 @@ function getStatusMeta(status: string) {
     case "COMPLETED":
       return {
         label: "Completed",
-        bg: "bg-green-50",
-        badge: "border-green-200 bg-green-50 text-green-700",
-        bar: "bg-green-600",
+        bg: "bg-status-green-bg",
+        badge: "border-status-green-border bg-status-green-bg text-status-green-text",
+        bar: "bg-status-green-text",
         icon: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-status-green-text"
           >
             <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
@@ -472,11 +472,11 @@ function getStatusMeta(status: string) {
     case "FAILED":
       return {
         label: "Failed",
-        bg: "bg-red-50",
-        badge: "border-red-200 bg-red-50 text-red-700",
-        bar: "bg-red-600",
+        bg: "bg-status-red-bg",
+        badge: "border-status-red-border bg-status-red-bg text-status-red-text",
+        bar: "bg-status-red-text",
         icon: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-status-red-text"
           >
             <circle cx="12" cy="12" r="10" />
             <line x1="15" y1="9" x2="9" y2="15" />
@@ -487,11 +487,11 @@ function getStatusMeta(status: string) {
     case "QUEUED":
       return {
         label: "Queued",
-        bg: "bg-amber-50",
-        badge: "border-amber-200 bg-amber-50 text-amber-700",
-        bar: "bg-amber-600",
+        bg: "bg-status-amber-bg",
+        badge: "border-status-amber-border bg-status-amber-bg text-status-amber-text",
+        bar: "bg-status-amber-text",
         icon: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-status-amber-text"
           >
             <path d="M5 22h14" />
             <path d="M5 2h14" />
@@ -503,11 +503,11 @@ function getStatusMeta(status: string) {
     default:
       return {
         label: status,
-        bg: "bg-muted",
-        badge: "border-border bg-muted text-muted-foreground",
-        bar: "bg-foreground",
+        bg: "bg-status-slate-bg",
+        badge: "border-status-slate-border bg-status-slate-bg text-status-slate-text",
+        bar: "bg-status-slate-text",
         icon: (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-status-slate-text"
           >
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
@@ -528,7 +528,7 @@ function JobDetailSkeleton() {
         <div className="h-4 w-48 animate-pulse rounded bg-muted" />
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-background p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />
           <div className="h-4 w-10 animate-pulse rounded bg-muted" />
@@ -538,7 +538,7 @@ function JobDetailSkeleton() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+          <div key={i} className="rounded-2xl border border-border bg-background p-5 shadow-sm">
             <div className="h-3 w-16 animate-pulse rounded bg-muted" />
             <div className="mt-2 h-6 w-24 animate-pulse rounded bg-muted" />
           </div>
@@ -549,7 +549,7 @@ function JobDetailSkeleton() {
         <div className="h-3 w-24 animate-pulse rounded bg-muted" />
         <div className="grid gap-3 md:grid-cols-2">
           {[1, 2].map((i) => (
-            <div key={i} className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+            <div key={i} className="rounded-2xl border border-border bg-background p-5 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 animate-pulse rounded-xl bg-muted" />
                 <div className="space-y-2">

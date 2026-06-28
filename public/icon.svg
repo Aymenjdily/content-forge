@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flame" x1="256" y1="64" x2="256" y2="352" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="55%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded-square background -->
+  <rect width="512" height="512" rx="128" fill="#1a1a1a"/>
+
+  <!-- anvil body -->
+  <path d="M176 224h160l-24 104h-112l-24-104Z" fill="#faf9f7"/>
+
+  <!-- anvil base -->
+  <path d="M128 360c0-17.6 14.4-32 32-32h192c17.6 0 32 14.4 32 32v24c0 17.6-14.4 32-32 32H160c-17.6 0-32-14.4-32-32v-24Z" fill="#faf9f7"/>
+
+  <!-- flame -->
+  <path d="M256 80c-32 64-72 104-72 160 0 44 32 76 72 76s72-32 72-76c0-56-40-96-72-160Z" fill="url(#flame)"/>
+</svg>

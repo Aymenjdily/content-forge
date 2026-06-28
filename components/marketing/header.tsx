@@ -11,6 +11,7 @@ const nav = [
   { label: "Features", href: "/#features" },
   { label: "How it works", href: "/#how-it-works" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog/building-ai-content-pipeline" },
   { label: "About", href: "/about" },
 ];
 
@@ -87,7 +88,7 @@ function MobileUserNav({ onClick }: { onClick: () => void }) {
         <Link
           href="/login"
           onClick={onClick}
-          className="rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-white hover:text-foreground"
+          className="rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           Log in
         </Link>
@@ -118,7 +119,7 @@ function MobileUserNav({ onClick }: { onClick: () => void }) {
       <Link
         href="/platform"
         onClick={onClick}
-        className="flex items-center gap-3 rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-white hover:text-foreground"
+        className="flex items-center gap-3 rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       >
         <div className="relative h-8 w-8 overflow-hidden rounded-full bg-muted">
           {user.imageUrl ? (
@@ -169,7 +170,7 @@ export function MarketingHeader() {
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white hover:text-foreground md:hidden"
+          className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
           aria-label="Toggle menu"
         >
           <span className="sr-only">{mobileOpen ? "Close menu" : "Open menu"}</span>
@@ -208,7 +209,7 @@ export function MarketingHeader() {
               key={item.href}
               href={item.href}
               onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-white hover:text-foreground"
+              className="flex items-center justify-between rounded-lg px-3 py-3 text-base text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <span>{item.label}</span>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-border">

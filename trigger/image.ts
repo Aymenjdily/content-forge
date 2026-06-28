@@ -2,6 +2,7 @@ import { logger, task } from "@trigger.dev/sdk/v3";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import Replicate from "replicate";
+import { put } from "@vercel/blob";
 
 interface ImageInput {
   jobId: string;
@@ -69,6 +70,30 @@ export const imageTask = task({
         }
 
         logger.info("Replicate image parsed", { jobId, imageUrl });
+
+        // Replicate URLs are temporary. Upload to Vercel Blob for persistence.
+        if (imageUrl && process.env.BLOB_READ_WRITE_TOKEN) {
+          try {
+            const imageResponse = await fetch(imageUrl);
+            if (imageResponse.ok) {
+              const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+              const blob = await put(`jobs/${jobId}/cover-${Date.now()}.png`, imageBuffer, {
+                access: "public",
+                contentType: "image/png",
+              });
+              imageUrl = blob.url;
+              logger.info("Uploaded cover image to Blob", { jobId, blobUrl: imageUrl });
+            } else {
+              logger.warn("Failed to fetch Replicate image for Blob upload", {
+                jobId,
+                status: imageResponse.status,
+              });
+            }
+          } catch (blobError) {
+            const message = blobError instanceof Error ? blobError.message : "Blob upload failed";
+            logger.warn(message, { jobId });
+          }
+        }
       } else {
         imageError = "REPLICATE_API_TOKEN not set";
         logger.warn(imageError, { jobId });

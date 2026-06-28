@@ -55,6 +55,16 @@ const nav = [
     ),
   },
   {
+    label: "Scheduler",
+    href: "/platform/scheduler",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
     label: "Settings",
     href: "/platform/settings",
     icon: (
@@ -100,7 +110,7 @@ export function PlatformSidebar({ collapsed }: PlatformSidebarProps) {
             <Logo size={24} />
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-semibold tracking-tight">Content Forge</span>
-              <span className="rounded border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700">
+              <span className="rounded border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-accent">
                 Beta
               </span>
             </div>

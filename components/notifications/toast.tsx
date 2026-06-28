@@ -66,9 +66,9 @@ function ToastItem({
     <div
       className={cn(
         "flex w-80 items-start gap-3 rounded-xl border bg-background p-4 shadow-lg transition-all",
-        notification.type === "success" && "border-green-200",
-        notification.type === "error" && "border-red-200",
-        notification.type === "warning" && "border-amber-200",
+        notification.type === "success" && "border-status-green-border",
+        notification.type === "error" && "border-status-red-border",
+        notification.type === "warning" && "border-status-amber-border",
         notification.type === "info" && "border-border"
       )}
     >
@@ -95,12 +95,12 @@ function ToastItem({
 function typeDot(type: string) {
   switch (type) {
     case "success":
-      return "bg-green-500";
+      return "bg-status-green-text";
     case "warning":
-      return "bg-amber-500";
+      return "bg-status-amber-text";
     case "error":
-      return "bg-red-500";
+      return "bg-status-red-text";
     default:
-      return "bg-blue-500";
+      return "bg-status-blue-text";
   }
 }

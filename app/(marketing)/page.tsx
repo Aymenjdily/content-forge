@@ -86,7 +86,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-white px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
               >
                 View pricing
               </Link>
@@ -98,7 +98,7 @@ export default function LandingPage() {
           <div className="lg:col-span-6">
             <div className="relative">
               <div className="absolute -right-3 -bottom-3 h-full w-full rounded-2xl border border-border bg-muted" />
-              <div className="relative grid gap-4 rounded-2xl border border-border bg-white p-5 shadow-sm sm:grid-cols-2">
+              <div className="relative grid gap-4 rounded-2xl border border-border bg-background p-5 shadow-sm sm:grid-cols-2">
                 {testimonials.map((t, i) => (
                   <blockquote
                     key={t.name}
@@ -130,7 +130,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="border-y border-border bg-white">
+      <section id="features" className="border-y border-border bg-muted">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="mb-14 max-w-xl">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Features</p>
@@ -139,7 +139,7 @@ export default function LandingPage() {
 
           <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
             {highlights.map((item) => (
-              <div key={item.number} className="bg-white p-8">
+              <div key={item.number} className="bg-background p-8">
                 <span className="text-xs font-semibold text-accent">{item.number}</span>
                 <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
@@ -168,7 +168,7 @@ export default function LandingPage() {
               <span className="absolute -top-3 left-4 flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-primary-foreground">
                 {index + 1}
               </span>
-              <div className="rounded-2xl border border-border bg-white p-6 pt-8">
+              <div className="rounded-2xl border border-border bg-background p-6 pt-8">
                 <h3 className="text-base font-semibold">{item.step}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
               </div>
@@ -177,7 +177,65 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-28">
+      <section id="from-the-build-log" className="border-y border-border bg-muted">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mb-14 max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Build log</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight">Follow the build.</h2>
+            <p className="mt-3 text-muted-foreground">
+              Deep dives into the architecture, the demo video script, and what we learned shipping each feature.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Link
+              href="/blog/building-ai-content-pipeline"
+              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-background p-6 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div>
+                <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+                  Blog post
+                </span>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
+                  Building an AI Content Pipeline with Next.js and Trigger.dev
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Architecture deep dive, code snippets, and lessons learned from automating research → draft → SEO → image.
+                </p>
+              </div>
+              <span className="mt-6 inline-flex items-center text-sm font-medium text-accent group-hover:underline">
+                Read the post
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </Link>
+
+            <Link
+              href="/demo"
+              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-background p-6 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div>
+                <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+                  Demo video
+                </span>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">Watch the pipeline in action</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  A 45–60 second walkthrough from topic to publish-ready assets. Script and production notes included.
+                </p>
+              </div>
+              <span className="mt-6 inline-flex items-center text-sm font-medium text-accent group-hover:underline">
+                View the script
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="relative overflow-hidden rounded-2xl bg-foreground p-10 text-primary-foreground sm:p-14">
           <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">

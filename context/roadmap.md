@@ -24,11 +24,11 @@
 ## Phase 3: Polish & Sharing (Week 4)
 - [x] Content Library with export features
 - [x] Template system
-- [ ] Cron scheduler for recurring jobs
-- [ ] Mobile responsiveness
-- [ ] Dark mode
-- [ ] Open-source the repo with great README
-- [ ] Write blog post + create demo video
+- [x] Cron scheduler for recurring jobs
+- [x] Mobile responsiveness
+- [x] Dark mode
+- [x] Open-source the repo with great README
+- [x] Write blog post + create demo video
 - [ ] Share on LinkedIn, Dev.to, Reddit, HN
 
 ## Phase 4: Community Features (Post-launch)

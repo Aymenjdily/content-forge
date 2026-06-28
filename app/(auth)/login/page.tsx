@@ -58,7 +58,7 @@ export default function LoginPage() {
 
         <Link
           href="/register"
-          className="mt-6 flex w-full items-center justify-center rounded-md border border-border bg-white px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="mt-6 flex w-full items-center justify-center rounded-md border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
         >
           Create an account
         </Link>

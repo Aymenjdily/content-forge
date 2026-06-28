@@ -28,9 +28,9 @@
 - "Show HN: AI Content Forge — Automated content pipeline with Next.js"
 
 ## GitHub Repo Checklist
-- [ ] Great README with GIF demo, architecture diagram, and setup instructions
-- [ ] MIT License
-- [ ] Contributing guidelines
+- [x] Great README with GIF demo, architecture diagram, and setup instructions
+- [x] MIT License
+- [x] Contributing guidelines
 - [ ] Issue templates
 - [ ] Live demo link in repo description
 - [ ] Screenshots in `/docs` folder

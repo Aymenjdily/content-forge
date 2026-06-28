@@ -36,7 +36,7 @@ export function Button({
       <button
         disabled={disabled}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50",
+          "inline-flex items-center justify-center rounded-lg border border-status-red-border bg-background px-4 py-2 text-sm font-medium text-status-red-text transition-colors hover:bg-status-red-bg disabled:opacity-50",
           size === "sm" && "px-3 py-1.5 text-xs",
           className
         )}
@@ -67,7 +67,7 @@ export function Button({
     <button
       disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50",
         size === "sm" && "px-3 py-1.5 text-xs",
         className
       )}

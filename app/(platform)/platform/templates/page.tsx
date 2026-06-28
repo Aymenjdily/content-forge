@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { createTemplate, deleteTemplate, getTemplates, type Template } from "@/lib/actions/templates";
 import { Button } from "@/components/platform/button";
+import { Modal } from "@/components/platform/modal";
 import { useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -135,7 +136,7 @@ export default function TemplatesPage() {
 
 function TemplateCard({ template, onDelete }: { template: Template; onDelete: (id: string) => void }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-border bg-white p-5 shadow-sm transition-all hover:border-foreground/10 hover:shadow-md">
+    <div className="flex flex-col rounded-2xl border border-border bg-background p-5 shadow-sm transition-all hover:border-foreground/10 hover:shadow-md">
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
           <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
@@ -217,34 +218,26 @@ function CreateTemplateDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/40"
-        aria-label="Close dialog"
-      />
-
-      <div className="relative z-10 w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-lg">
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold tracking-tight">Create template</h3>
-            <p className="text-sm text-muted-foreground">Save a reusable configuration for future jobs.</p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Close"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+    <Modal open onClose={onClose} className="p-6">
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight">Create template</h3>
+          <p className="text-sm text-muted-foreground">Save a reusable configuration for future jobs.</p>
         </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Close"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">Name</label>
             <input
@@ -362,7 +355,6 @@ function CreateTemplateDialog({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

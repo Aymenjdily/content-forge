@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createJob } from "@/lib/actions/jobs";
 import { createTemplate, getTemplates, type Template } from "@/lib/actions/templates";
 import { Button } from "@/components/platform/button";
+import { Modal } from "@/components/platform/modal";
 import { useToast } from "@/components/notifications";
 import { cn } from "@/lib/utils";
 
@@ -174,7 +175,7 @@ function CheckboxButton({
             className={cn(
               "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
               selected
-                ? "border-accent bg-accent/10 text-amber-800"
+                ? "border-accent bg-accent/10 text-accent"
                 : "border-border bg-background text-muted-foreground hover:border-accent/30 hover:text-foreground"
             )}
           >
@@ -287,34 +288,26 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        type="button"
-        onClick={handleClose}
-        className="absolute inset-0 bg-black/40"
-        aria-label="Close dialog"
-      />
-
-      <div className="relative z-10 w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-lg">
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold tracking-tight">Create a new content job</h3>
-            <p className="text-sm text-muted-foreground">Tell us what you want to write about and we will research, draft, and optimize it.</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Close"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+    <Modal open={open} onClose={handleClose} className="p-6">
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight">Create a new content job</h3>
+          <p className="text-sm text-muted-foreground">Tell us what you want to write about and we will research, draft, and optimize it.</p>
         </div>
+        <button
+          type="button"
+          onClick={handleClose}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Close"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
 
-        <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
+      <form action={formAction} onSubmit={handleSubmit} className="space-y-5">
           <input type="hidden" name="tone" value={tone} />
           <input type="hidden" name="length" value={length} />
           {selectedPlatforms.map((p) => (
@@ -421,7 +414,7 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
           </div>
 
           {state.error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{state.error}</p>
+            <p className="rounded-lg border border-status-red-border bg-status-red-bg px-4 py-3 text-sm text-status-red-text">{state.error}</p>
           )}
 
           <div className="flex items-center justify-end gap-3 pt-2">
@@ -437,7 +430,6 @@ export function NewJobDialog({ open, onOpenChange }: NewJobDialogProps) {
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

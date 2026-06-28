@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #faf9f7;
   --foreground: #1a1a1a;
@@ -11,7 +13,54 @@
   --accent: #d97706;
   --accent-foreground: #fffbeb;
   --radius: 0.5rem;
+
+  --status-blue-bg: #eff6ff;
+  --status-blue-text: #1d4ed8;
+  --status-blue-border: #bfdbfe;
+  --status-green-bg: #f0fdf4;
+  --status-green-text: #15803d;
+  --status-green-border: #bbf7d0;
+  --status-red-bg: #fef2f2;
+  --status-red-text: #b91c1c;
+  --status-red-border: #fecaca;
+  --status-amber-bg: #fffbeb;
+  --status-amber-text: #b45309;
+  --status-amber-border: #fde68a;
+  --status-slate-bg: #f1f5f9;
+  --status-slate-text: #475569;
+  --status-slate-border: #e2e8f0;
+
   color-scheme: light;
+}
+
+.dark {
+  --background: #0f0f10;
+  --foreground: #f2f0ec;
+  --muted: #1a1a1c;
+  --muted-foreground: #a1a1a1;
+  --border: #2a2a2c;
+  --primary: #f2f0ec;
+  --primary-foreground: #0f0f10;
+  --accent: #f59e0b;
+  --accent-foreground: #1a1a1a;
+
+  --status-blue-bg: rgba(59, 130, 246, 0.15);
+  --status-blue-text: #60a5fa;
+  --status-blue-border: rgba(59, 130, 246, 0.3);
+  --status-green-bg: rgba(34, 197, 94, 0.15);
+  --status-green-text: #4ade80;
+  --status-green-border: rgba(34, 197, 94, 0.3);
+  --status-red-bg: rgba(239, 68, 68, 0.15);
+  --status-red-text: #f87171;
+  --status-red-border: rgba(239, 68, 68, 0.3);
+  --status-amber-bg: rgba(245, 158, 11, 0.15);
+  --status-amber-text: #fbbf24;
+  --status-amber-border: rgba(245, 158, 11, 0.3);
+  --status-slate-bg: rgba(148, 163, 184, 0.15);
+  --status-slate-text: #94a3b8;
+  --status-slate-border: rgba(148, 163, 184, 0.3);
+
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -24,6 +73,21 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-status-blue-bg: var(--status-blue-bg);
+  --color-status-blue-text: var(--status-blue-text);
+  --color-status-blue-border: var(--status-blue-border);
+  --color-status-green-bg: var(--status-green-bg);
+  --color-status-green-text: var(--status-green-text);
+  --color-status-green-border: var(--status-green-border);
+  --color-status-red-bg: var(--status-red-bg);
+  --color-status-red-text: var(--status-red-text);
+  --color-status-red-border: var(--status-red-border);
+  --color-status-amber-bg: var(--status-amber-bg);
+  --color-status-amber-text: var(--status-amber-text);
+  --color-status-amber-border: var(--status-amber-border);
+  --color-status-slate-bg: var(--status-slate-bg);
+  --color-status-slate-text: var(--status-slate-text);
+  --color-status-slate-border: var(--status-slate-border);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);

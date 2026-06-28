@@ -140,7 +140,7 @@ export function ContentLibrary() {
                 "rounded-lg border px-3 py-1.5 text-xs font-medium transition-all",
                 status === filter.value
                   ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                  : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground"
               )}
             >
               {filter.label}
@@ -153,7 +153,7 @@ export function ContentLibrary() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search content..."
-          className="w-full rounded-lg border border-border bg-white px-4 py-2 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring sm:w-64"
+          className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm outline-none ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring sm:w-64"
         />
       </div>
 
@@ -186,7 +186,7 @@ export function ContentLibrary() {
                   type="button"
                   onClick={() => fetchJobs(pagination.page - 1, status, search, true)}
                   disabled={pagination.page <= 1}
-                  className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-50"
+                  className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   Previous
                 </button>
@@ -194,7 +194,7 @@ export function ContentLibrary() {
                   type="button"
                   onClick={() => fetchJobs(pagination.page + 1, status, search, true)}
                   disabled={pagination.page >= pagination.totalPages}
-                  className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-50"
+                  className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -219,7 +219,7 @@ function LibraryCard({ job, onExport }: LibraryCardProps) {
   const status = getStatusMeta(job.status);
 
   return (
-    <div className="flex flex-col rounded-2xl border border-border bg-white p-5 shadow-sm transition-all hover:border-foreground/10 hover:shadow-md">
+    <div className="flex flex-col rounded-2xl border border-border bg-background p-5 shadow-sm transition-all hover:border-foreground/10 hover:shadow-md">
       {job.imageUrl ? (
         <div className="mb-4 overflow-hidden rounded-xl">
           <img src={job.imageUrl} alt="Cover" className="aspect-video w-full object-cover" />
@@ -297,7 +297,7 @@ function ExportMenu({ job, onExport }: LibraryCardProps) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-xl border border-border bg-white p-1 shadow-lg">
+          <div className="absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-xl border border-border bg-background p-1 shadow-lg">
             {[
               { value: "markdown", label: "Markdown" },
               { value: "html", label: "HTML" },
@@ -328,25 +328,25 @@ function getStatusMeta(status: string) {
     case "PENDING":
       return {
         label: "In progress",
-        badge: "border-blue-200 bg-blue-50 text-blue-700",
+        badge: "border-status-blue-border bg-status-blue-bg text-status-blue-text",
         bar: "bg-blue-600",
       };
     case "COMPLETED":
       return {
         label: "Completed",
-        badge: "border-green-200 bg-green-50 text-green-700",
+        badge: "border-status-green-border bg-status-green-bg text-status-green-text",
         bar: "bg-green-600",
       };
     case "FAILED":
       return {
         label: "Failed",
-        badge: "border-red-200 bg-red-50 text-red-700",
+        badge: "border-status-red-border bg-status-red-bg text-status-red-text",
         bar: "bg-red-600",
       };
     case "CANCELLED":
       return {
         label: "Cancelled",
-        badge: "border-slate-200 bg-slate-100 text-slate-700",
+        badge: "border-status-slate-border bg-status-slate-bg text-status-slate-text",
         bar: "bg-slate-500",
       };
     default:

@@ -36,7 +36,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-white">
+      <section className="border-y border-border bg-muted">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-8 sm:grid-cols-3">
             {values.map((value) => (

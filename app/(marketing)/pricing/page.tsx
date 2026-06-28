@@ -55,12 +55,12 @@ export default function PricingPage() {
                 relative flex flex-col rounded-2xl border p-8
                 ${plan.highlighted
                   ? "border-foreground bg-foreground text-primary-foreground shadow-xl"
-                  : "border-border bg-white"
+                  : "border-border bg-background"
                 }
               `}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 left-6 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                <span className="absolute -top-3 left-6 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-accent-foreground">
                   Most popular
                 </span>
               )}
